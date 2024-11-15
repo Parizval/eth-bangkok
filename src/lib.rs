@@ -15,16 +15,19 @@
 #![cfg_attr(not(feature = "export-abi"), no_main)]
 extern crate alloc;
 
-use alloy_primitives::FixedBytes;
+use alloc::string::String;
 /// Import items from the SDK. The prelude contains common traits and macros.
 use stylus_sdk::{
-    alloy_primitives::{Address, U256},
+    abi::Bytes,
+    alloy_primitives::{Address, FixedBytes, U256},
     crypto::keccak,
     prelude::*,
 };
 
-use alloy_sol_types::sol_data::Address as SOLAddress;
-
+use alloy_sol_types::{
+    sol_data::{Address as SOLAddress, Bytes as SOLBytes, String as SOLString, *},
+    SolType,
+};
 // Define some persistent storage using the Solidity ABI.
 // `LendingHook` will be the entrypoint.
 sol_storage! {
@@ -37,19 +40,18 @@ sol_storage! {
 /// Declare that `LendingHook` is a contract with the following external methods.
 #[public]
 impl LendingHook {
-    pub fn deposit(tokenAddress: Address, recipient: Address) {}
+    pub fn deposit(token: Address, recipient: Address) {}
 
-    pub fn getCallData(&self, func: String, tokenAddress: Address, recipient: Address) -> Vec<u8> {
+    pub fn get_call_data(&self, func: String, token: Address, recipient: Address) -> Vec<u8> {
         type DepositType = (SOLAddress, SOLAddress);
 
-        let deposit_data = (tokenAddress, recipient);
+        let deposit_data = (token, recipient);
 
-        // let data = DepositType::abi_encode_sequence(&deposit_data);
+        let data = DepositType::abi_encode_sequence(&deposit_data);
 
         let hashed_function_selector: FixedBytes<32> = keccak(func.as_bytes().to_vec()).into();
 
-        // TODO: Add function data
-        let calldata = [&hashed_function_selector[..4]].concat();
+        let calldata = [&hashed_function_selector[..4], &data].concat();
 
         calldata
     }
