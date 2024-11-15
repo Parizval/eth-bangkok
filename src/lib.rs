@@ -33,14 +33,18 @@ use alloy_sol_types::{
 sol_storage! {
     #[entrypoint]
     pub struct LendingHook {
-        uint256 number;
+
+        // Token-to-vault address mappings
+        //
+        mapping(address => address) aave_contracts;
+        mapping(address=> address) fluid_contracts;
     }
 }
 
 /// Declare that `LendingHook` is a contract with the following external methods.
 #[public]
 impl LendingHook {
-    pub fn deposit(token: Address, recipient: Address) {}
+    pub fn deposit(_token: Address, _recipient: Address) {}
 
     pub fn get_call_data(&self, func: String, token: Address, recipient: Address) -> Vec<u8> {
         type DepositType = (SOLAddress, SOLAddress);
