@@ -23,6 +23,7 @@ use stylus_sdk::{
     call::Call,
     contract,
     crypto::keccak,
+    msg,
     prelude::*,
 };
 
@@ -31,6 +32,9 @@ use alloy_sol_types::{
     sol_data::{Address as SOLAddress, Bytes as SOLBytes, String as SOLString, *},
     SolType,
 };
+
+const OWNER: &str = "0x9C96CFe9A37605bdb2D1462022265754f76B5E4B";
+
 // Define some persistent storage using the Solidity ABI.
 // `LendingHook` will be the entrypoint.
 sol_storage! {
@@ -51,6 +55,8 @@ sol! {
     error ApproveCallFailed();
 
     error DepositCallFailed();
+
+    error NotOwnerAddress();
 }
 
 #[derive(SolidityError)]
@@ -58,6 +64,7 @@ pub enum LendingHookErrors {
     InsufficentTokenBalance(InsufficentTokenBalance),
     ApproveCallFailed(ApproveCallFailed),
     DepositCallFailed(DepositCallFailed),
+    NotOwnerAddress(NotOwnerAddress),
 }
 
 sol_interface! {
@@ -138,8 +145,14 @@ impl LendingHook {
     }
 
     pub fn add_vault(&mut self, token: Address, vault: Address) -> Result<(), LendingHookErrors> {
-        // Store Vault Address
+        // Owner Address Check
+        let owner_address = Address::parse_checksummed(OWNER, None).expect("Invalid Address");
 
+        if msg::sender() != owner_address {
+            return Err(LendingHookErrors::NotOwnerAddress(NotOwnerAddress {}));
+        }
+
+        // Store Vault Address
         let mut token_vault = self.aave_contracts.setter(token);
         token_vault.set(vault);
 
