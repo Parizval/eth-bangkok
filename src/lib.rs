@@ -37,10 +37,8 @@ sol_storage! {
     pub struct LendingHook {
 
         // Token-to-vault address mappings
-        //
         mapping(address => address) aave_contracts;
         // mapping(address=> address) fluid_contracts;
-        uint256 balance;
     }
 }
 
@@ -89,6 +87,8 @@ sol_interface! {
         ) external ;
     }
 
+    // interface fluid {}
+
 
 }
 
@@ -109,8 +109,6 @@ impl LendingHook {
             ));
         }
 
-        self.balance.set(token_balance);
-
         let aave_contract_address = self.aave_contracts.get(token);
 
         // Deposit Call
@@ -121,10 +119,6 @@ impl LendingHook {
             Ok(_) => Ok(()),
             Err(_) => Err(LendingHookErrors::DepositCallFailed(DepositCallFailed {})),
         }
-    }
-
-    pub fn get_token_balance(&self) -> U256 {
-        self.balance.get()
     }
 
     pub fn get_vault_address(&self, token: Address) -> Address {
@@ -144,6 +138,27 @@ impl LendingHook {
         let calldata = [&hashed_function_selector[..4], &data].concat();
 
         calldata
+    }
+
+    pub fn add_vault(&mut self, token: Address, vault: Address) -> Result<(), LendingHookErrors> {
+        // Owner Address Check
+        let owner_address = Address::parse_checksummed(OWNER, None).expect("Invalid Address");
+
+        if msg::sender() != owner_address {
+            return Err(LendingHookErrors::NotOwnerAddress(NotOwnerAddress {}));
+        }
+
+        // Store Vault Address
+        let mut token_vault = self.aave_contracts.setter(token);
+        token_vault.set(vault);
+
+        // Infinite Approve Call
+        let token_contract = IERC20::new(token);
+        let config = Call::new_in(self);
+        match token_contract.approve(config, vault, U256::MAX) {
+            Ok(_) => Ok(()),
+            Err(_) => Err(LendingHookErrors::ApproveCallFailed(ApproveCallFailed {})),
+        }
     }
 
     pub fn recover_token(
@@ -178,27 +193,6 @@ impl LendingHook {
             Err(_) => Err(LendingHookErrors::TokenTransferFailed(
                 TokenTransferFailed {},
             )),
-        }
-    }
-
-    pub fn add_vault(&mut self, token: Address, vault: Address) -> Result<(), LendingHookErrors> {
-        // Owner Address Check
-        let owner_address = Address::parse_checksummed(OWNER, None).expect("Invalid Address");
-
-        if msg::sender() != owner_address {
-            return Err(LendingHookErrors::NotOwnerAddress(NotOwnerAddress {}));
-        }
-
-        // Store Vault Address
-        let mut token_vault = self.aave_contracts.setter(token);
-        token_vault.set(vault);
-
-        // Infinite Approve Call
-        let token_contract = IERC20::new(token);
-        let config = Call::new_in(self);
-        match token_contract.approve(config, vault, U256::MAX) {
-            Ok(_) => Ok(()),
-            Err(_) => Err(LendingHookErrors::ApproveCallFailed(ApproveCallFailed {})),
         }
     }
 }
