@@ -3,6 +3,7 @@
 //!
 //! The following contract implements the Counter example from Foundry.
 //!
+
 //!
 //! The program is ABI-equivalent with Solidity, which means you can call it from both Solidity and Rust.
 //! To do this, run `cargo stylus export-abi`.
@@ -14,44 +15,42 @@
 #![cfg_attr(not(feature = "export-abi"), no_main)]
 extern crate alloc;
 
+use alloy_primitives::FixedBytes;
 /// Import items from the SDK. The prelude contains common traits and macros.
-use stylus_sdk::{alloy_primitives::U256, prelude::*};
+use stylus_sdk::{
+    alloy_primitives::{Address, U256},
+    crypto::keccak,
+    prelude::*,
+};
+
+use alloy_sol_types::sol_data::Address as SOLAddress;
 
 // Define some persistent storage using the Solidity ABI.
-// `Counter` will be the entrypoint.
+// `LendingHook` will be the entrypoint.
 sol_storage! {
     #[entrypoint]
-    pub struct Counter {
+    pub struct LendingHook {
         uint256 number;
     }
 }
 
-/// Declare that `Counter` is a contract with the following external methods.
+/// Declare that `LendingHook` is a contract with the following external methods.
 #[public]
-impl Counter {
-    /// Gets the number from storage.
-    pub fn number(&self) -> U256 {
-        self.number.get()
-    }
+impl LendingHook {
+    pub fn deposit(tokenAddress: Address, recipient: Address) {}
 
-    /// Sets a number in storage to a user-specified value.
-    pub fn set_number(&mut self, new_number: U256) {
-        self.number.set(new_number);
-    }
+    pub fn getCallData(&self, func: String, tokenAddress: Address, recipient: Address) -> Vec<u8> {
+        type DepositType = (SOLAddress, SOLAddress);
 
-    /// Sets a number in storage to a user-specified value.
-    pub fn mul_number(&mut self, new_number: U256) {
-        self.number.set(new_number * self.number.get());
-    }
+        let deposit_data = (tokenAddress, recipient);
 
-    /// Sets a number in storage to a user-specified value.
-    pub fn add_number(&mut self, new_number: U256) {
-        self.number.set(new_number + self.number.get());
-    }
+        // let data = DepositType::abi_encode_sequence(&deposit_data);
 
-    /// Increments `number` and updates its value in storage.
-    pub fn increment(&mut self) {
-        let number = self.number.get();
-        self.set_number(number + U256::from(1));
+        let hashed_function_selector: FixedBytes<32> = keccak(func.as_bytes().to_vec()).into();
+
+        // TODO: Add function data
+        let calldata = [&hashed_function_selector[..4]].concat();
+
+        calldata
     }
 }
