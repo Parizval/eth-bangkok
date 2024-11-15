@@ -18,7 +18,6 @@ extern crate alloc;
 use alloc::string::String;
 /// Import items from the SDK. The prelude contains common traits and macros.
 use stylus_sdk::{
-    abi::Bytes,
     alloy_primitives::{Address, FixedBytes, U256},
     call::Call,
     contract,
@@ -27,11 +26,7 @@ use stylus_sdk::{
     prelude::*,
 };
 
-use alloy_sol_types::{
-    sol,
-    sol_data::{Address as SOLAddress, Bytes as SOLBytes, String as SOLString, *},
-    SolType,
-};
+use alloy_sol_types::{sol, sol_data::Address as SOLAddress, SolType};
 
 const OWNER: &str = "0x9C96CFe9A37605bdb2D1462022265754f76B5E4B";
 
