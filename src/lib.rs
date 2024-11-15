@@ -89,6 +89,13 @@ sol_interface! {
 
     // interface fluid {}
 
+    interface Compound {
+
+        function supplyTo(address dst, address asset, uint amount) external ;
+
+    }
+
+
 
 }
 
@@ -194,5 +201,11 @@ impl LendingHook {
                 TokenTransferFailed {},
             )),
         }
+    }
+}
+
+impl LendingHook {
+    pub fn calculate_compound_interest_rate(&self) -> U256 {
+        U256::ZERO
     }
 }
