@@ -20,6 +20,8 @@ use alloc::string::String;
 use stylus_sdk::{
     abi::Bytes,
     alloy_primitives::{Address, FixedBytes, U256},
+    call::Call,
+    contract,
     crypto::keccak,
     prelude::*,
 };
@@ -56,7 +58,13 @@ sol_interface! {
 /// Declare that `LendingHook` is a contract with the following external methods.
 #[public]
 impl LendingHook {
-    pub fn deposit(_token: Address, _recipient: Address) {}
+    pub fn deposit(&mut self, token: Address, _recipient: Address) {
+        // get total balance
+        let token_contract = IERC20::new(token);
+        let config = Call::new_in(self);
+
+        let token_balance = token_contract.balance_of(config, contract::address());
+    }
 
     pub fn get_call_data(&self, func: String, token: Address, recipient: Address) -> Vec<u8> {
         type DepositType = (SOLAddress, SOLAddress);
