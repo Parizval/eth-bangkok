@@ -49,12 +49,15 @@ sol! {
     error InsufficentTokenBalance();
 
     error ApproveCallFailed();
+
+    error DepositCallFailed();
 }
 
 #[derive(SolidityError)]
 pub enum LendingHookErrors {
     InsufficentTokenBalance(InsufficentTokenBalance),
     ApproveCallFailed(ApproveCallFailed),
+    DepositCallFailed(DepositCallFailed),
 }
 
 sol_interface! {
@@ -67,16 +70,23 @@ sol_interface! {
 
     }
 
+    interface Aave{
+
+        function supply(
+            address asset,
+            uint256 amount,
+            address onBehalfOf,
+            uint16 referralCode
+        ) external ;
+    }
+
+
 }
 
 /// Declare that `LendingHook` is a contract with the following external methods.
 #[public]
 impl LendingHook {
-    pub fn deposit(
-        &mut self,
-        token: Address,
-        _recipient: Address,
-    ) -> Result<(), LendingHookErrors> {
+    pub fn deposit(&mut self, token: Address, recipient: Address) -> Result<(), LendingHookErrors> {
         // get contract token balance
         let token_contract = IERC20::new(token);
         let config = Call::new_in(self);
@@ -92,9 +102,16 @@ impl LendingHook {
 
         self.balance.set(token_balance);
 
-        // Deposit Call
+        let aave_contract_address = self.aave_contracts.get(token);
 
-        Ok(())
+        // Deposit Call
+        let deposit_contract = Aave::new(aave_contract_address);
+        let config = Call::new_in(self);
+
+        match deposit_contract.supply(config, token, token_balance, recipient, u16::MIN) {
+            Ok(_) => Ok(()),
+            Err(_) => Err(LendingHookErrors::DepositCallFailed(DepositCallFailed {})),
+        }
     }
 
     pub fn get_token_balance(&self) -> U256 {
