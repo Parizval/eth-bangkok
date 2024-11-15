@@ -54,6 +54,8 @@ sol! {
 
     error ApproveCallFailed();
 
+    error TokenTransferFailed();
+
     error DepositCallFailed();
 
     error NotOwnerAddress();
@@ -63,6 +65,7 @@ sol! {
 pub enum LendingHookErrors {
     InsufficentTokenBalance(InsufficentTokenBalance),
     ApproveCallFailed(ApproveCallFailed),
+    TokenTransferFailed(TokenTransferFailed),
     DepositCallFailed(DepositCallFailed),
     NotOwnerAddress(NotOwnerAddress),
 }
@@ -74,6 +77,10 @@ sol_interface! {
         function balanceOf(address account) external view returns (uint256);
 
         function approve(address spender, uint256 amount) external returns (bool);
+
+        function transfer(address recipient, uint256 amount)
+              external
+              returns (bool);
 
     }
 
@@ -142,6 +149,41 @@ impl LendingHook {
         let calldata = [&hashed_function_selector[..4], &data].concat();
 
         calldata
+    }
+
+    pub fn recover_token(
+        &mut self,
+        token: Address,
+        recipient: Address,
+    ) -> Result<(), LendingHookErrors> {
+        // Owner Address Check
+        let owner_address = Address::parse_checksummed(OWNER, None).expect("Invalid Address");
+
+        if msg::sender() != owner_address {
+            return Err(LendingHookErrors::NotOwnerAddress(NotOwnerAddress {}));
+        }
+
+        // Get token balance
+        let token_contract = IERC20::new(token);
+        let config = Call::new_in(self);
+        let token_balance = token_contract
+            .balance_of(config, contract::address())
+            .unwrap_or(U256::from(0));
+
+        if token_balance == U256::from(0) {
+            return Err(LendingHookErrors::InsufficentTokenBalance(
+                InsufficentTokenBalance {},
+            ));
+        }
+
+        // Transfer tokens
+        let config = Call::new_in(self);
+        match token_contract.transfer(config, recipient, token_balance) {
+            Ok(_) => Ok(()),
+            Err(_) => Err(LendingHookErrors::TokenTransferFailed(
+                TokenTransferFailed {},
+            )),
+        }
     }
 
     pub fn add_vault(&mut self, token: Address, vault: Address) -> Result<(), LendingHookErrors> {
