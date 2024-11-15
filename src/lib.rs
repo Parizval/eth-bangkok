@@ -41,6 +41,7 @@ sol_storage! {
         //
         mapping(address => address) aave_contracts;
         // mapping(address=> address) fluid_contracts;
+        uint256 balance;
     }
 }
 
@@ -89,7 +90,20 @@ impl LendingHook {
             ));
         }
 
+        self.balance.set(token_balance);
+
+        // Deposit Call
+
         Ok(())
+    }
+
+    pub fn get_token_balance(&self) -> U256 {
+        self.balance.get()
+    }
+
+    pub fn get_vault_address(&self, token: Address) -> Address {
+        let token_vault = self.aave_contracts.getter(token);
+        token_vault.get()
     }
 
     pub fn get_call_data(&self, func: String, token: Address, recipient: Address) -> Vec<u8> {
@@ -108,6 +122,9 @@ impl LendingHook {
 
     pub fn add_vault(&mut self, token: Address, vault: Address) -> Result<(), LendingHookErrors> {
         // Store Vault Address
+
+        let mut token_vault = self.aave_contracts.setter(token);
+        token_vault.set(vault);
 
         // Infinite Approve Call
         let token_contract = IERC20::new(token);
