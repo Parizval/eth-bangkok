@@ -27,6 +27,7 @@ use stylus_sdk::{
 };
 
 use alloy_sol_types::{
+    sol,
     sol_data::{Address as SOLAddress, Bytes as SOLBytes, String as SOLString, *},
     SolType,
 };
@@ -39,8 +40,20 @@ sol_storage! {
         // Token-to-vault address mappings
         //
         mapping(address => address) aave_contracts;
-        mapping(address=> address) fluid_contracts;
+        // mapping(address=> address) fluid_contracts;
     }
+}
+
+sol! {
+    error InsufficentTokenBalance();
+
+    error ApproveCallFailed();
+}
+
+#[derive(SolidityError)]
+pub enum LendingHookErrors {
+    InsufficentTokenBalance(InsufficentTokenBalance),
+    ApproveCallFailed(ApproveCallFailed),
 }
 
 sol_interface! {
@@ -58,12 +71,25 @@ sol_interface! {
 /// Declare that `LendingHook` is a contract with the following external methods.
 #[public]
 impl LendingHook {
-    pub fn deposit(&mut self, token: Address, _recipient: Address) {
-        // get total balance
+    pub fn deposit(
+        &mut self,
+        token: Address,
+        _recipient: Address,
+    ) -> Result<(), LendingHookErrors> {
+        // get contract token balance
         let token_contract = IERC20::new(token);
         let config = Call::new_in(self);
+        let token_balance = token_contract
+            .balance_of(config, contract::address())
+            .unwrap_or(U256::from(0));
 
-        let token_balance = token_contract.balance_of(config, contract::address());
+        if token_balance == U256::from(0) {
+            return Err(LendingHookErrors::InsufficentTokenBalance(
+                InsufficentTokenBalance {},
+            ));
+        }
+
+        Ok(())
     }
 
     pub fn get_call_data(&self, func: String, token: Address, recipient: Address) -> Vec<u8> {
@@ -78,5 +104,17 @@ impl LendingHook {
         let calldata = [&hashed_function_selector[..4], &data].concat();
 
         calldata
+    }
+
+    pub fn add_vault(&mut self, token: Address, vault: Address) -> Result<(), LendingHookErrors> {
+        // Store Vault Address
+
+        // Infinite Approve Call
+        let token_contract = IERC20::new(token);
+        let config = Call::new_in(self);
+        match token_contract.approve(config, vault, U256::MAX) {
+            Ok(_) => Ok(()),
+            Err(_) => Err(LendingHookErrors::ApproveCallFailed(ApproveCallFailed {})),
+        }
     }
 }
