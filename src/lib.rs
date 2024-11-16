@@ -365,21 +365,21 @@ impl LendingHook {
     }
 }
 
-#[cfg(test)]
-mod tests {
+// #[cfg(test)]
+// mod tests {
 
-    use super::*;
+//     use super::*;
 
-    #[motsu::test]
-    fn it_gets_calldata(contract: LendingHook) {
-        let testnet_token_address = "0xb1D4538B4571d411F07960EF2838Ce337FE1E80E";
+//     #[motsu::test]
+//     fn it_gets_calldata(contract: LendingHook) {
+//         let testnet_token_address = "0xb1D4538B4571d411F07960EF2838Ce337FE1E80E";
 
-        let recipient_address = "0xE451141fCE63EB38e85F08a991fC5878Ee6335b2";
+//         let recipient_address = "0xE451141fCE63EB38e85F08a991fC5878Ee6335b2";
 
-        // let call_data = contract.get_call_data(
-        //     "deposit".to_string(),
-        //     testnet_token_address,
-        //     recipient_address,
-        // );
-    }
-}
+//         // let call_data = contract.get_call_data(
+//         //     "deposit".to_string(),
+//         //     testnet_token_address,
+//         //     recipient_address,
+//         // );
+//     }
+// }
