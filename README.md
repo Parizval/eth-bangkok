@@ -24,6 +24,11 @@ The project is a stylus based smart contract which helps users on CowSwap deposi
 
 -> Interest Rate Comparison Module is still in development to provide most high yields at point of swap execution
 
+## Transaction Examples
+
+[Deposting USDC to Aave Pool](https://explorer.cow.fi/arb1/orders/0x61e99cd8da923d2aa23b55031d5cf55bfc01ce9c2cf8edce479dda4eb35498fee451141fce63eb38e85f08a991fc5878ee6335b26738a474?tab=overview)
+
+
 ## Screenshots
 
 ![Image](./img/aave-lending-hook.png)
