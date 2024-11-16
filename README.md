@@ -1,4 +1,4 @@
-![Image](./header.png)
+![Image](./code.png)
 
 # CowSwap Lending Hook using Stylus
 
@@ -27,8 +27,6 @@ The project is a stylus based smart contract which helps users on CowSwap deposi
 
  - [Compound V3 USDC Pool](https://arbiscan.io/address/0x9c4ec768c28520B50860ea7a15bd7213a9fF58bf)
 
-
-## Contract Addresses
 
 ## Supported Pools
 
