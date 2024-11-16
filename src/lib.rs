@@ -100,16 +100,16 @@ sol_interface! {
         ) external ;
     }
 
-    // interface fluid {}
+    interface Fluidx {
+
+        function deposit(uint256 assets_, address receiver_) external;
+    }
 
     interface Compound {
 
         function supplyTo(address dst, address asset, uint amount) external ;
 
     }
-
-
-
 }
 
 /// Declare that `LendingHook` is a contract with the following external methods.
@@ -184,7 +184,34 @@ impl LendingHook {
     }
 
     pub fn fluid(&mut self, token: Address, recipient: Address) -> Result<(), LendingHookErrors> {
-        Ok(())
+        let token_contract = IERC20::new(token);
+        let config = Call::new_in(self);
+        let token_balance = token_contract
+            .balance_of(config, contract::address())
+            .unwrap_or(U256::from(0));
+
+        if token_balance == U256::from(0) {
+            return Err(LendingHookErrors::InsufficentTokenBalance(
+                InsufficentTokenBalance {},
+            ));
+        }
+
+        let fluidx_contract = self.compound_contracts.get(token);
+
+        let vault = Fluidx::new(fluidx_contract);
+        let config = Call::new_in(self);
+
+        evm::log(Deposit {
+            sender: msg::sender(),
+            token,
+            vault: fluidx_contract,
+            recipient,
+        });
+
+        match vault.deposit(config, token_balance, recipient) {
+            Ok(_) => Ok(()),
+            Err(_) => Err(LendingHookErrors::DepositCallFailed(DepositCallFailed {})),
+        }
     }
 
     pub fn get_aave_vault(&self, token: Address) -> Address {
