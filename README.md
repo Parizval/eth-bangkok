@@ -15,10 +15,30 @@ The project is a stylus based smart contract which helps users on CowSwap deposi
 
  -> CowSwap hook integration and User interface for executing transactions
 
-## Deployment
+ -> Foundry for contract calls and setup of Hook contract
+
+## Deployment and Configuration Addresses
+
+ - [Hook Contract Address](https://arbiscan.io/address/0xd309bb9ece740338beb5fd6b98d7e78c1f13a886)
+
+ - [USDC Contract Address](https://arbiscan.io/address/0xaf88d065e77c8cC2239327C5EDb3A432268e5831)
+
+ - [Aave V3 Pool](https://arbiscan.io/address/0x794a61358D6845594F94dc1DB02A252b5b4814aD)
+
+ - [Compound V3 USDC Pool](https://arbiscan.io/address/0x9c4ec768c28520B50860ea7a15bd7213a9fF58bf)
+
 
 ## Contract Addresses
 
+## Supported Pools
+
+ - Aave USDC
+
+ - Aave USDT
+
+ - Aave LUSD
+
+ - Compound V3 USDC
 
 ## Limitations
 
