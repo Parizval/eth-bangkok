@@ -1,14 +1,6 @@
 //!
-//! Stylus Hello World
-//!
-//! The following contract implements the Counter example from Foundry.
-//!
-
-//!
 //! The program is ABI-equivalent with Solidity, which means you can call it from both Solidity and Rust.
 //! To do this, run `cargo stylus export-abi`.
-//!
-//! Note: this code is a template-only and has not been audited.
 //!
 
 // Allow `cargo stylus export-abi` to generate a main function.
