@@ -46,6 +46,7 @@ The project is a stylus based smart contract which helps users on CowSwap deposi
 
 [Deposting USDC to Aave Pool](https://explorer.cow.fi/arb1/orders/0x61e99cd8da923d2aa23b55031d5cf55bfc01ce9c2cf8edce479dda4eb35498fee451141fce63eb38e85f08a991fc5878ee6335b26738a474?tab=overview)
 
+[Depositing USDC to Compound V3 Pool](https://explorer.cow.fi/arb1/orders/0x335133521d77d738ba762a9774d362b1a2f77a0ffd258e00636e9e8867cd98a3e451141fce63eb38e85f08a991fc5878ee6335b26738f2c9?tab=overview)
 
 ## Screenshots
 
