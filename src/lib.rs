@@ -15,18 +15,15 @@
 #![cfg_attr(not(feature = "export-abi"), no_main)]
 extern crate alloc;
 
-use alloc::string::String;
 /// Import items from the SDK. The prelude contains common traits and macros.
 use stylus_sdk::{
-    alloy_primitives::{Address, FixedBytes, U256},
+    alloy_primitives::{Address, U256},
     call::Call,
-    contract,
-    crypto::keccak,
-    evm, msg,
+    contract, evm, msg,
     prelude::*,
 };
 
-use alloy_sol_types::{sol, sol_data::Address as SOLAddress, SolType};
+use alloy_sol_types::sol;
 
 const OWNER: &str = "0x9C96CFe9A37605bdb2D1462022265754f76B5E4B";
 
@@ -233,20 +230,6 @@ impl LendingHook {
         token_vault.get()
     }
 
-    pub fn get_call_data(&self, func: String, token: Address, recipient: Address) -> Vec<u8> {
-        type DepositType = (SOLAddress, SOLAddress);
-
-        let deposit_data = (token, recipient);
-
-        let data = DepositType::abi_encode_sequence(&deposit_data);
-
-        let hashed_function_selector: FixedBytes<32> = keccak(func.as_bytes().to_vec()).into();
-
-        let calldata = [&hashed_function_selector[..4], &data].concat();
-
-        calldata
-    }
-
     pub fn add_aave_vault(
         &mut self,
         token: Address,
@@ -382,27 +365,21 @@ impl LendingHook {
     }
 }
 
-impl LendingHook {
-    pub fn calculate_compound_interest_rate(&self) -> U256 {
-        U256::ZERO
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[motsu::test]
+    fn it_gets_calldata(contract: LendingHook) {
+        let testnet_token_address = "0xb1D4538B4571d411F07960EF2838Ce337FE1E80E";
+
+        let recipient_address = "0xE451141fCE63EB38e85F08a991fC5878Ee6335b2";
+
+        // let call_data = contract.get_call_data(
+        //     "deposit".to_string(),
+        //     testnet_token_address,
+        //     recipient_address,
+        // );
     }
 }
-
-// #[cfg(test)]
-// mod tests {
-
-//     use super::*;
-
-//     #[motsu::test]
-//     fn it_gets_calldata(contract: LendingHook) {
-//         let testnet_token_address = "0xb1D4538B4571d411F07960EF2838Ce337FE1E80E";
-
-//         let recipient_address = "0xE451141fCE63EB38e85F08a991fC5878Ee6335b2";
-
-//         let call_data = contract.get_call_data(
-//             "deposit".to_string(),
-//             testnet_token_address,
-//             recipient_address,
-//         );
-//     }
-// }
