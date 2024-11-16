@@ -99,8 +99,8 @@ sol_interface! {
         function supply(
             address asset,
             uint256 amount,
-            address onBehalfOf,
-            uint16 referralCode
+            address on_behalf_of,
+            uint16 referral_code
         ) external ;
     }
 
@@ -187,7 +187,7 @@ impl LendingHook {
         }
     }
 
-    pub fn fluid(&mut self, token: Address, recipient: Address) -> Result<(), LendingHookErrors> {
+    pub fn fluidx(&mut self, token: Address, recipient: Address) -> Result<(), LendingHookErrors> {
         let token_contract = IERC20::new(token);
         let config = Call::new_in(self);
         let token_balance = token_contract
