@@ -8,6 +8,8 @@ The project is a stylus based smart contract which helps users on CowSwap deposi
 
 ## Installation
 
+The project used the starter stylus template for development.
+
 
 ## Technologies Used
 
@@ -16,6 +18,8 @@ The project is a stylus based smart contract which helps users on CowSwap deposi
  -> CowSwap hook integration and User interface for executing transactions
 
  -> Foundry for contract calls and setup of Hook contract
+
+ -> Vuejs to develop hook UI over CowSwap
 
 ## Deployment and Configuration Addresses
 
@@ -40,7 +44,7 @@ The project is a stylus based smart contract which helps users on CowSwap deposi
 
 ## Limitations
 
--> Interest Rate Comparison Module is still in development to provide most high yields at point of swap execution
+-> Shifting Interest Rate Comparison Module to on-chain to have better interest rates at the point of execution.
 
 ## Transaction Examples
 
@@ -55,7 +59,13 @@ The project is a stylus based smart contract which helps users on CowSwap deposi
 
 ## Future Scope of Work
 
+-> Addition of More complex lending & borrowing operations
 
+-> Use of Motsu and e2e frameworks to increase test coverage of stylus contracts
+
+-> Gas reduction of smart contracts
+
+-> Integrating more DeFi Protocol interfaces
 
 
 
