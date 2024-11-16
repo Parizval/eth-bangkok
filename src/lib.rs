@@ -197,7 +197,7 @@ impl LendingHook {
             ));
         }
 
-        let fluidx_contract = self.compound_contracts.get(token);
+        let fluidx_contract = self.fluidx_contracts.get(token);
 
         let vault = Fluidx::new(fluidx_contract);
         let config = Call::new_in(self);
