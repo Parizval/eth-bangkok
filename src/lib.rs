@@ -39,7 +39,7 @@ sol_storage! {
         // Token-to-vault address mappings
         mapping(address => address) aave_contracts;
 
-        mapping(address=> address) fluid_contracts;
+        mapping(address=> address) fluidx_contracts;
 
         mapping(address=> address) compound_contracts;
     }
@@ -225,7 +225,7 @@ impl LendingHook {
     }
 
     pub fn get_fluid_vault(&self, token: Address) -> Address {
-        let token_vault = self.fluid_contracts.getter(token);
+        let token_vault = self.fluidx_contracts.getter(token);
         token_vault.get()
     }
 
@@ -318,7 +318,7 @@ impl LendingHook {
         }
 
         // Store Vault Address
-        let mut token_vault = self.fluid_contracts.setter(token);
+        let mut token_vault = self.fluidx_contracts.setter(token);
         token_vault.set(vault);
 
         evm::log(AddedVault {
