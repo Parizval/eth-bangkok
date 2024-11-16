@@ -60,7 +60,7 @@ sol! {
 
     event Deposit(address sender, address token, address vault, address recipient);
 
-    event RecoverToken(address sender, address token, address vault);
+    event RecoverToken(address sender, address token, address recipient);
 
 }
 
@@ -176,6 +176,12 @@ impl LendingHook {
         let mut token_vault = self.aave_contracts.setter(token);
         token_vault.set(vault);
 
+        evm::log(AddedVault {
+            sender: msg::sender(),
+            token,
+            vault,
+        });
+
         // Infinite Approve Call
         let token_contract = IERC20::new(token);
         let config = Call::new_in(self);
@@ -209,6 +215,12 @@ impl LendingHook {
                 InsufficentTokenBalance {},
             ));
         }
+
+        evm::log(RecoverToken {
+            sender: msg::sender(),
+            token,
+            recipient,
+        });
 
         // Transfer tokens
         let config = Call::new_in(self);
