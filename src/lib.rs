@@ -59,9 +59,13 @@ sol! {
     error NotOwnerAddress();
 
     // Evm Events
-    event AddedVault (address sender, address token, address vault);
+    event addedAaveVault (address sender, address token, address vault);
+    event addedCompoundVault (address sender, address token, address vault);
+    event addedFluidxVault (address sender, address token, address vault);
 
-    event Deposit(address sender, address token, address vault, address recipient);
+    event aaveDeposit(address sender, address token, address vault, address recipient);
+    event compoundDeposit(address sender, address token, address vault, address recipient);
+    event fluidxDeposit(address sender, address token, address vault, address recipient);
 
     event RecoverToken(address sender, address token, address recipient);
 
@@ -135,7 +139,7 @@ impl LendingHook {
         let deposit_contract = Aave::new(aave_contract_address);
         let config = Call::new_in(self);
 
-        evm::log(Deposit {
+        evm::log(aaveDeposit {
             sender: msg::sender(),
             token,
             vault: aave_contract_address,
@@ -170,7 +174,7 @@ impl LendingHook {
         let vault = Compound::new(compound_contract);
         let config = Call::new_in(self);
 
-        evm::log(Deposit {
+        evm::log(compoundDeposit {
             sender: msg::sender(),
             token,
             vault: compound_contract,
@@ -201,7 +205,7 @@ impl LendingHook {
         let vault = Fluidx::new(fluidx_contract);
         let config = Call::new_in(self);
 
-        evm::log(Deposit {
+        evm::log(fluidxDeposit {
             sender: msg::sender(),
             token,
             vault: fluidx_contract,
@@ -259,7 +263,7 @@ impl LendingHook {
         let mut token_vault = self.aave_contracts.setter(token);
         token_vault.set(vault);
 
-        evm::log(AddedVault {
+        evm::log(addedAaveVault {
             sender: msg::sender(),
             token,
             vault,
@@ -290,7 +294,7 @@ impl LendingHook {
         let mut token_vault = self.compound_contracts.setter(token);
         token_vault.set(vault);
 
-        evm::log(AddedVault {
+        evm::log(addedCompoundVault {
             sender: msg::sender(),
             token,
             vault,
@@ -321,7 +325,7 @@ impl LendingHook {
         let mut token_vault = self.fluidx_contracts.setter(token);
         token_vault.set(vault);
 
-        evm::log(AddedVault {
+        evm::log(addedFluidxVault {
             sender: msg::sender(),
             token,
             vault,
