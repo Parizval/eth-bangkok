@@ -4,10 +4,16 @@
 
 ## Project Description
 
+The project is a stylus based smart contract which helps users on CowSwap deposit their output tokens directly to top lending platforms available on arbitrum.
+
 ## Installation
 
 
 ## Technologies Used
+
+ -> Arbitrum Stylus for contract development
+
+ -> CowSwap hook integration and User interface for executing transactions
 
 ## Deployment
 
@@ -16,6 +22,7 @@
 
 ## Limitations
 
+-> Interest Rate Comparison Module is still in development to provide most high yields at point of swap execution
 
 ## Future Scope of Work
 
