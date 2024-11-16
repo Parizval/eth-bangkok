@@ -38,7 +38,10 @@ sol_storage! {
 
         // Token-to-vault address mappings
         mapping(address => address) aave_contracts;
-        // mapping(address=> address) fluid_contracts;
+
+        mapping(address=> address) fluid_contracts;
+
+        mapping(address=> address) compound_contracts;
     }
 }
 
@@ -112,7 +115,7 @@ sol_interface! {
 /// Declare that `LendingHook` is a contract with the following external methods.
 #[public]
 impl LendingHook {
-    pub fn deposit(&mut self, token: Address, recipient: Address) -> Result<(), LendingHookErrors> {
+    pub fn aave(&mut self, token: Address, recipient: Address) -> Result<(), LendingHookErrors> {
         // get contract token balance
         let token_contract = IERC20::new(token);
         let config = Call::new_in(self);
@@ -145,8 +148,57 @@ impl LendingHook {
         }
     }
 
-    pub fn get_vault_address(&self, token: Address) -> Address {
+    pub fn compound(
+        &mut self,
+        token: Address,
+        recipient: Address,
+    ) -> Result<(), LendingHookErrors> {
+        let token_contract = IERC20::new(token);
+        let config = Call::new_in(self);
+        let token_balance = token_contract
+            .balance_of(config, contract::address())
+            .unwrap_or(U256::from(0));
+
+        if token_balance == U256::from(0) {
+            return Err(LendingHookErrors::InsufficentTokenBalance(
+                InsufficentTokenBalance {},
+            ));
+        }
+
+        let compound_contract = self.compound_contracts.get(token);
+
+        let vault = Compound::new(compound_contract);
+        let config = Call::new_in(self);
+
+        evm::log(Deposit {
+            sender: msg::sender(),
+            token,
+            vault: compound_contract,
+            recipient,
+        });
+
+        match vault.supply_to(config, recipient, token, token_balance) {
+            Ok(_) => Ok(()),
+            Err(_) => Err(LendingHookErrors::DepositCallFailed(DepositCallFailed {})),
+        }
+    }
+
+    pub fn fluid(&mut self, token: Address, recipient: Address) -> Result<(), LendingHookErrors> {
+        Ok(())
+    }
+
+    pub fn get_aave_vault(&self, token: Address) -> Address {
         let token_vault = self.aave_contracts.getter(token);
+        token_vault.get()
+    }
+
+    pub fn get_compound_vault(&self, token: Address) -> Address {
+        let token_vault = self.compound_contracts.getter(token);
+        token_vault.get()
+    }
+
+    pub fn get_fluid_vault(&self, token: Address) -> Address {
+        let token_vault = self.fluid_contracts.getter(token);
         token_vault.get()
     }
 
@@ -164,7 +216,11 @@ impl LendingHook {
         calldata
     }
 
-    pub fn add_vault(&mut self, token: Address, vault: Address) -> Result<(), LendingHookErrors> {
+    pub fn add_aave_vault(
+        &mut self,
+        token: Address,
+        vault: Address,
+    ) -> Result<(), LendingHookErrors> {
         // Owner Address Check
         let owner_address = Address::parse_checksummed(OWNER, None).expect("Invalid Address");
 
