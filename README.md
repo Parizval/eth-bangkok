@@ -1,4 +1,4 @@
-![Image](./code.png)
+![Image](./img/code.png)
 
 # CowSwap Lending Hook using Stylus
 
