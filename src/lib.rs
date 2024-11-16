@@ -17,6 +17,7 @@ use stylus_sdk::{
 
 use alloy_sol_types::sol;
 
+// Specify OWNER for ADMIN_OPERATIONS
 const OWNER: &str = "0x9C96CFe9A37605bdb2D1462022265754f76B5E4B";
 
 // Define some persistent storage using the Solidity ABI.
