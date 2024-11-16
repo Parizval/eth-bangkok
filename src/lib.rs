@@ -274,6 +274,68 @@ impl LendingHook {
         }
     }
 
+    pub fn add_compound_vault(
+        &mut self,
+        token: Address,
+        vault: Address,
+    ) -> Result<(), LendingHookErrors> {
+        // Owner Address Check
+        let owner_address = Address::parse_checksummed(OWNER, None).expect("Invalid Address");
+
+        if msg::sender() != owner_address {
+            return Err(LendingHookErrors::NotOwnerAddress(NotOwnerAddress {}));
+        }
+
+        // Store Vault Address
+        let mut token_vault = self.compound_contracts.setter(token);
+        token_vault.set(vault);
+
+        evm::log(AddedVault {
+            sender: msg::sender(),
+            token,
+            vault,
+        });
+
+        // Infinite Approve Call
+        let token_contract = IERC20::new(token);
+        let config = Call::new_in(self);
+        match token_contract.approve(config, vault, U256::MAX) {
+            Ok(_) => Ok(()),
+            Err(_) => Err(LendingHookErrors::ApproveCallFailed(ApproveCallFailed {})),
+        }
+    }
+
+    pub fn add_fluidx_vault(
+        &mut self,
+        token: Address,
+        vault: Address,
+    ) -> Result<(), LendingHookErrors> {
+        // Owner Address Check
+        let owner_address = Address::parse_checksummed(OWNER, None).expect("Invalid Address");
+
+        if msg::sender() != owner_address {
+            return Err(LendingHookErrors::NotOwnerAddress(NotOwnerAddress {}));
+        }
+
+        // Store Vault Address
+        let mut token_vault = self.fluid_contracts.setter(token);
+        token_vault.set(vault);
+
+        evm::log(AddedVault {
+            sender: msg::sender(),
+            token,
+            vault,
+        });
+
+        // Infinite Approve Call
+        let token_contract = IERC20::new(token);
+        let config = Call::new_in(self);
+        match token_contract.approve(config, vault, U256::MAX) {
+            Ok(_) => Ok(()),
+            Err(_) => Err(LendingHookErrors::ApproveCallFailed(ApproveCallFailed {})),
+        }
+    }
+
     pub fn recover_token(
         &mut self,
         token: Address,
