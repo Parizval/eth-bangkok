@@ -22,7 +22,7 @@ use stylus_sdk::{
     call::Call,
     contract,
     crypto::keccak,
-    msg,
+    evm, msg,
     prelude::*,
 };
 
@@ -43,6 +43,8 @@ sol_storage! {
 }
 
 sol! {
+
+    // Errors
     error InsufficentTokenBalance();
 
     error ApproveCallFailed();
@@ -52,6 +54,14 @@ sol! {
     error DepositCallFailed();
 
     error NotOwnerAddress();
+
+    // Evm Events
+    event AddedVault (address sender, address token, address vault);
+
+    event Deposit(address sender, address token, address vault, address recipient);
+
+    event RecoverToken(address sender, address token, address vault);
+
 }
 
 #[derive(SolidityError)]
@@ -121,6 +131,13 @@ impl LendingHook {
         // Deposit Call
         let deposit_contract = Aave::new(aave_contract_address);
         let config = Call::new_in(self);
+
+        evm::log(Deposit {
+            sender: msg::sender(),
+            token,
+            vault: aave_contract_address,
+            recipient,
+        });
 
         match deposit_contract.supply(config, token, token_balance, recipient, u16::MIN) {
             Ok(_) => Ok(()),
@@ -209,3 +226,22 @@ impl LendingHook {
         U256::ZERO
     }
 }
+
+// #[cfg(test)]
+// mod tests {
+
+//     use super::*;
+
+//     #[motsu::test]
+//     fn it_gets_calldata(contract: LendingHook) {
+//         let testnet_token_address = "0xb1D4538B4571d411F07960EF2838Ce337FE1E80E";
+
+//         let recipient_address = "0xE451141fCE63EB38e85F08a991fC5878Ee6335b2";
+
+//         let call_data = contract.get_call_data(
+//             "deposit".to_string(),
+//             testnet_token_address,
+//             recipient_address,
+//         );
+//     }
+// }
