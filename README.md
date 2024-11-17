@@ -54,6 +54,8 @@ The project used the starter stylus template for development.
 
 ## Screenshots
 
+![Banner](./img/banner.jpg)
+
 ![Image](./img/aave-lending-hook.png)
 
 
@@ -65,9 +67,10 @@ The project used the starter stylus template for development.
 
 -> Gas reduction of smart contracts
 
--> Integrating more DeFi Protocol interfaces
+-> Integrating more DeFi Protocol interfaces and targetting derivatives.
 
 
+### Stylus Project Documentation
 
 
 
