@@ -54,7 +54,7 @@ The project used the starter stylus template for development.
 
 ## Screenshots
 
-![Banner](./img/banner.jpg)
+![Banner](./img/banner.png)
 
 ![Image](./img/aave-lending-hook.png)
 
