@@ -61,13 +61,14 @@ The project used the starter stylus template for development.
 
 ## Future Scope of Work
 
--> Addition of More complex lending & borrowing operations
+- Addition of More complex lending & borrowing operations
 
--> Use of Motsu and e2e frameworks to increase test coverage of stylus contracts
+- Use of Motsu and e2e frameworks to increase test coverage of stylus contracts
 
--> Gas reduction of smart contracts
+- Gas reduction of smart contracts
 
--> Integrating more DeFi Protocol interfaces and targetting derivatives.
+- Integrating more DeFi Protocol interfaces and targetting derivatives.
+
 
 
 ### Stylus Project Documentation
